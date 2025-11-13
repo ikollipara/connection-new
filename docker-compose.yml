@@ -1,0 +1,24 @@
+services:
+  db:
+    platform: linux/amd64
+    image: mariadb:latest
+    ports:
+      - "3306:3306"
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+      MARIADB_USER: connection
+      MARIADB_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+      MARIADB_DATABASE: connection
+    volumes:
+      - '.docker/mariadb:/var/lib/mariadb'
+      - './docker/mariadb/10-setup-database.sql:/docker-entrypoint-initdb.d/10-setup-database.sql'
+
+  mailpit:
+    platform: linux/amd64
+    image: axllent/mailpit
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+
+  
+    

@@ -1,0 +1,3 @@
+CREATE DATABASE IF NOT EXISTS connection_test;
+GRANT ALL PRIVILEGES ON connection_test.* TO connection;
+FLUSH PRIVILEGES;

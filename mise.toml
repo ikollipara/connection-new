@@ -1,0 +1,62 @@
+[tasks.manage]
+run = "uv run manage.py"
+description = "Django Management"
+env = { "DEBUG" = true }
+
+[tasks.test]
+run = "uv run manage.py test"
+description = "Test Django"
+depends = ["build"]
+env = { "DEBUG" = false, DJANGO_TASKS_BACKEND = "django_tasks.backends.dummy.DummyBackend", EMAIL_URL="memory:", DATABASE_URL = "mysql://connection:connection@127.0.0.1:3306/connection_test" }
+depends_post = ["clean"]
+
+[tasks.fe-dev]
+run = "npm run dev"
+description = "Vite Dev"
+hide = true
+
+[tasks.django-dev]
+run = "uv run manage.py runserver"
+description = "Django Dev"
+hide = true
+
+[tasks.dev]
+run = [
+  { tasks = ["fe-dev", "django-dev"] },
+]
+description = "Run Dev"
+env = { "DEBUG" = true }
+
+[tasks.fe-build]
+run = "npm run build"
+hide = true
+
+[tasks.django-build]
+run = [
+  "mkdir staticfiles",
+  "uv run manage.py collectstatic"
+]
+hide = true
+
+[tasks.clean]
+description = "Clean built static assets"
+run = "rm -rf staticfiles"
+
+[tasks.build]
+description = "Build Static Assets"
+run = [
+  { task = "fe-build" },
+  { task = "django-build" },
+]
+
+[tools]
+node = "latest"
+python = "3.12"
+uv = "latest"
+
+[env]
+SECRET_KEY = "lG7GdxTeITR4Ok/Nj8MyJaNv6IqGXZnaDFcX8elqXVk="
+DATABASE_URL = "mysql://connection:connection@127.0.0.1:3306/connection"
+MARIADB_ROOT_PASSWORD = "connection"
+DJANGO_TASKS_BACKEND = "django_tasks.backends.immediate.ImmediateBackend"
+EMAIL_URL="smtp://localhost:1025"
