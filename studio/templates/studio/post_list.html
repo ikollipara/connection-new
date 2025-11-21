@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %} | Studio{% endblock %}
+
+{% block content %}
+    <main class="container">
+	<h1>conneCTION Studio</h1>
+	<hr/>
+	<turbo-frame id="posts" class="stack" data-controller="frame-reload" data-action="turbo:submit-end->frame-reload#reload:!self">
+	    <form data-controller="submit-form">
+		{{ form }}
+	    </form>
+	    <div class="stack">
+		{% for post in posts %}
+		    {% include "studio/partials/post_card.html" %}
+		    {% if not forloop.last %}
+			<hr style="width: 100%; height: 5px;" />
+		    {% endif %}
+		{% empty %}
+		    <h2>No Posts yet</h2>
+		    <a data-turbo-frame="_top" href="{% url 'studio:post_create' %}">Create a new post.</a>
+		{% endfor %}
+	    </div>
+	</turbo-frame>
+    </main>
+{% endblock %}

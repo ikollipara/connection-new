@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %} | {{ post.title }}{% endblock %}
+
+{% block content %}
+    <main class="container">
+	<div class="post-heading">
+	    <div class="container">
+		<div class="post-heading__inner">
+		    <h1 class="post-heading__title">
+			{{ post.title }}
+		    </h1>
+		    <form
+			data-controller="submit-form"
+			data-action="turbo:load@document->submit-form#submit:once"
+			method="post"
+			action="{% url 'content:post_view' post.pk %}"
+		    >
+			{% csrf_token %}
+		    </form>
+		    <div class="post-heading__meta">
+			<button class="btn btn--outline-primary btn--sm">{% heroicon_solid 'eye' class="btn__icon" %}{{ post.views }}</button>
+			{% if user.is_authenticated %}
+			    {% include 'content/partials/like_form.html' with likes=post.likes__count %}
+			{% else %}
+			    <a class="btn btn--outline-primary btn--sm" href="{% url 'accounts:login_form' %}">
+				{% heroicon_outline 'hand-thumb-up' class="btn__icon" %}
+				{{ post.likes__count }}
+			    </a>
+			{% endif %}
+			<a class="post-author">
+			    <!--<img class="post-author__avatar" src="https://secure.gravatar.com/avatar/fd9479a898c593601efd2fe758a86dba?s=96&d=mm&r=g" alt="" width="38" height="38"/>-->
+			    <span class="post-author__name">by {{ post.user.name }}</span>
+			</a>
+			<span>
+			    <span class="sr-only">Posted on</span>
+			    <time datetime="{{ post.published_at }}">{{ post.published_at }}</time>
+			</span>
+		    </div>
+		</div>
+	    </div>
+	</div>
+	{{ post.body|json_script:"post_data" }}
+	<div
+	    class="post-content"
+	    data-controller="post-display"
+	    data-post-display-data-value="post_data"
+	>
+	</div>
+	<hr/>
+	<h3>Comments</h3>
+	
+    </main>
+{% endblock %}

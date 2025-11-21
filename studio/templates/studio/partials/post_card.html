@@ -1,0 +1,54 @@
+{% load heroicons %}
+<turbo-frame id="post_{{ post.pk }}" class="post-card post-card--horizontal">
+    <div class="post-card__body">
+        <div class="post-card__meta">
+	    <div class="post-card__tags">
+		{% if post.metadata.grades.count %}
+		    <span>Grades: {{ post.metadata.grades.all|join:", " }}</span>
+		{% endif %}
+		{% if post.metadata.standards.count %}
+		    <br/>
+		    <span>Standards: {{ post.metadata.standards.all|join:", " }}</span>
+		{% endif %}
+            </div>
+	    {% if post.published_at %}
+		<time datetime="{{ post.published_at }}">{{ post.published_at }}</time>
+	    {% endif %}
+        </div>
+        <h2 class="post-card__title">
+            <a data-turbo-frame="_top" class="post-card__link" href="{% url 'studio:post_update' post.pk %}">{{ post.title }}</a>
+        </h2>
+	<div class="button-group">
+	    {% if not post.published_at %}
+		<form method="post" action="{% url 'studio:post_publish' post.pk %}">
+		    {% csrf_token %}
+		<button class="btn btn--primary btn--sm">
+		    Publish
+		</button>
+	    </form>
+	    {% else %}
+	    <button disabled class="btn btn--primary btn--sm">
+		{% heroicon_solid 'check' class="btn__icon" %}
+		Published
+	    </button>
+	    {% endif %}
+	    <form
+		method="post"
+		{% if post.archived_at %}
+		    action="{% url 'studio:post_unarchive' post.pk %}"
+		{% else %}
+		    action="{% url 'studio:post_archive' post.pk %}"
+		{% endif %}
+	    >
+		{% csrf_token %}
+		<button class="btn btn--outline-primary btn--sm">
+		    {% if post.archived_at %}
+			Unarchive
+		    {% else %}
+			Archive
+		    {% endif %}
+		</button>
+	    </form>
+	</div>
+    </div>
+</turbo-frame>

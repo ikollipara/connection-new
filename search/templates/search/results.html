@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %} | Search Results{% endblock %}
+
+{% block content %}
+    <main class="container">
+	<h1>Results for "{{ form.query.data }}"</h1>
+	<form method="get" data-controller="submit-form">
+	    {{ form }}	    
+	</form>
+	<hr/>
+	{% for post in results %}
+	    {% include 'content/partials/post_card.html' %}
+	    {% if not forloop.last %}
+		<hr/>
+	    {% endif %}
+	{% empty %}
+	    <h3>No Results found for "{{ form.query.data }}"</h3>
+	{% endfor %}
+    </main>
+
+{% endblock %}

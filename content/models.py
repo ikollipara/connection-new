@@ -8,6 +8,7 @@ Description: Content used throughout the site.
 
 from __future__ import annotations
 
+import json
 import typing as t
 from enum import StrEnum
 
@@ -40,7 +41,7 @@ class PostQuerySet(models.QuerySet["Post"]):
         likes: int = 0,
         grades: t.Sequence["Grade"] = None,
         standards: t.Sequence["Standard"] = None,
-    ):
+    ) -> t.Self:
         """Search through the database to find all possible posts."""
         q = self.is_published().is_archived(False)
         q = q.filter(
@@ -61,12 +62,42 @@ class PostQuerySet(models.QuerySet["Post"]):
 
         return q
 
+    def update_post_with_metadata(
+        self,
+        pk: int,
+        *,
+        title: str = "",
+        body: dict = None,
+        published_at: t.Optional[timezone.datetime] = None,
+        archived_at: t.Optional[timezone.datetime] = None,
+        grades: models.QuerySet["Grade"] = None,
+        standards: models.QuerySet["Standard"] = None,
+    ):
+        """Update a post, with additional metadata, for the given user."""
+        self.filter(pk=pk).update(
+            title=title,
+            body=body or {"blocks": []},
+        )
+        metadata = PostMetadata.objects.get(post=pk)
+        grades = grades or Grade.objects.none()
+        standards = standards or Standard.objects.none()
+
+        grade_pks = grades.values_list("pk", flat=True)
+        standard_pks = standards.values_list("pk", flat=True)
+
+        metadata.grades.set(grade_pks)
+        metadata.standards.set(standard_pks)
+        metadata.save()
+        metadata.refresh_from_db()
+
+        return self.get(pk=pk)
+
     def create_post_for_user(
         self,
         user: UserModel,
         *,
         title: str = "",
-        body: str = "",
+        body: dict = None,
         published_at: t.Optional[timezone.datetime] = None,
         archived_at: t.Optional[timezone.datetime] = None,
         grades: t.Sequence["Grade"] = None,
@@ -75,19 +106,26 @@ class PostQuerySet(models.QuerySet["Post"]):
         """Create a post, with additional metadata, for the given user."""
         inst = self.model(
             user=user,
-            title=title,
-            body=body,
+            title=title or "Unnamed Post",
+            body=body or {"blocks": []},
             published_at=published_at,
             archived_at=archived_at,
         )
         inst.full_clean()
         inst.save()
 
-        PostMetadata.objects.create(
-            grades=grades or [],
-            standards=standards or [],
-            post=inst,
-        )
+        m = PostMetadata.objects.create(post=inst)
+
+        grades = grades or Grade.objects.none()
+        standards = standards or Standard.objects.none()
+
+        grade_pks = grades.values_list("pk", flat=True)
+        standard_pks = standards.values_list("pk", flat=True)
+
+        m.grades.set(grade_pks)
+        m.standards.set(standard_pks)
+        m.save()
+        m.refresh_from_db()
 
         inst.refresh_from_db()
 
@@ -114,6 +152,20 @@ class PostQuerySet(models.QuerySet["Post"]):
         else:
             return self.is_archived()
 
+    def for_text(self, text: str):
+        """Filter if the body or title contain the given text."""
+        return self.filter(
+            models.Q(title__icontains=text) | models.Q(body__icontains=text)
+        )
+
+    def increment_views(self):
+        """Increment the views."""
+        return self.update(views=models.F("views") + 1)
+
+    def with_likes_count(self):
+        """Annotate to include the likes count."""
+        return self.annotate(likes__count=models.Count("likes"))
+
 
 class Post(models.Model):
     """
@@ -125,7 +177,7 @@ class Post(models.Model):
     objects: PostQuerySet = PostQuerySet.as_manager()
 
     title = models.CharField(_("Title"), max_length=512)
-    body = models.TextField(_("Body"))
+    body = models.JSONField(_("Body"), blank=True)
     user = models.ForeignKey(UserModel, on_delete=models.DO_NOTHING)
     published_at = models.DateTimeField(
         _("Published At"),
@@ -144,14 +196,6 @@ class Post(models.Model):
         symmetrical=False,
     )
 
-    def save(self, *args, **kwargs):
-        """Save changes to a post."""
-        creating = self.pk is None
-        super().save(*args, **kwargs)
-
-        if creating:
-            PostMetadata.objects.create(post=self)
-
     @property
     def status(self) -> PostStatus:
         """Get the status for the given post."""
@@ -163,6 +207,33 @@ class Post(models.Model):
 
         else:
             return PostStatus.DRAFT
+
+    def archive(self, dt=None):
+        """Archive the post."""
+        self.archived_at = dt or timezone.now()
+        self.save()
+
+    def unarchive(self):
+        """Unarchive the previous post."""
+        self.archived_at = None
+        self.save()
+
+    def publish(self, dt=None):
+        """Publish a post."""
+        self.published_at = dt or timezone.now()
+        self.save()
+
+    def like(self, user: UserModel):
+        """Like the given post."""
+        self.likes.create(user=user)
+
+    def unlike(self, user: UserModel):
+        """Unlike the given post."""
+        self.likes.filter(user=user).delete()
+
+    def was_liked_by(self, user: UserModel):
+        """Check if the given post was liked by the given user."""
+        return self.likes.filter(user=user).exists()
 
 
 class PostLike(models.Model):
@@ -304,6 +375,9 @@ class Grade(models.Model):
     """
 
     name = models.CharField(_("Name"), max_length=255, unique=True)
+
+    def __str__(self):
+        return self.name.capitalize()
 
 
 class PostMetadata(models.Model):

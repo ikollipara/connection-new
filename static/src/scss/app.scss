@@ -1,4 +1,60 @@
+@forward "overrides";
+@forward "layouts/container";
+@forward "components/site-navigation";
+@forward "components/site-header";
+@forward "components/file-group";
+@forward "components/alerts";
+@forward "components/editor";
+@forward "components/post-card";
+@forward "components/gallery";
+@forward "components/post-heading";
+@forward "components/post-content";
+@forward "components/post-author";
+@forward "pages/search";
 @use "sprucecss/scss/spruce" as *;
 
-
 @include generate-styles();
+
+select {
+    --ss-primary-color: $primary-color;
+    --ss-border-color: var(--spruce-form-color-border);
+    --ss-border-radius: 0.425rem;
+}
+
+.form-stack {
+    @include layout-stack('m');
+}
+
+
+dialog[open].stack {
+    display: flex;
+    flex-direction: column;
+
+    > *:not(:last-child) {
+	margin-bottom: spacer('m');
+    }
+}
+
+dialog.stack {
+    display: none;
+}
+
+.stack {
+    display: flex;
+    flex-direction: column;
+
+    > *:not(:last-child) {
+	margin-bottom: spacer('m');
+    }
+}
+
+
+.button-group {
+    display: grid;
+    grid-template-rows: 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
+
+    * + * {
+	margin-left: 1em;
+    }
+}

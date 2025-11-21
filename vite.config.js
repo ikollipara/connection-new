@@ -6,17 +6,22 @@
  * Description: Vite Configuration
  */
 
-import {defineConfig} from "vite";
+import { defineConfig } from "vite";
 import * as path from "node:path";
 
 export default defineConfig({
   plugins: [],
   base: "/static/",
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./static/src"),
+    },
+  },
   build: {
     outDir: path.resolve("./static/dist"),
     manifest: "manifest.json",
     rollupOptions: {
       input: path.resolve("./static/src/app.js"),
-    }
-  }
+    },
+  },
 });

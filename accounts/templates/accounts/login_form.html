@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %} | Log in{% endblock %}
+
+{% block content %}
+    <main class="container">
+	<h1>Log in</h1>
+	{% if messages %}
+	    {% for message in messages %}
+		<div role="alert" class="alert alert--success">
+		    {{ message }}
+		</div>
+	    {% endfor %}
+	{% endif %}
+	<form class="form-stack" method="post">
+	    {% csrf_token %}
+	    <div class="form-group">
+		<label class="form-label" for="{{ form.email.id_for_label }}">{{ form.email.label }}</label>
+		{% if form.email.errors %}
+		    {% for error in form.email.errors %}
+			<span class="field-feedback field-feedback--invalid">{{ error }}</span>
+		    {% endfor %}
+		{% endif %}
+		<span class="form-description" id="id_email_helptext">{{ form.email.help_text }}</span>
+		{{ form.email }}
+	    </div>
+	    <div class="form-group">
+		<button class="btn btn--primary btn--block">Login</button>		
+	    </div>
+	</form>
+    </main>
+{% endblock %}

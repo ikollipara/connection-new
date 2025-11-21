@@ -1,0 +1,48 @@
+{% load static %}
+<header class="site-header">
+    <div class="container">
+        <div class="site-header__inner">
+            <div class="site-header__column">
+                <a class="site-header__logo" href="/">
+                    <img src="{% static 'logo.png' %}" alt="conneCTION" width="48" height="48"/>
+                </a>
+		<span>conneCTION</span>
+                <nav class="site-navigation site-header__navigation" aria-label="Site">
+                    <ul id="primary-menu" class="navigation-menu">
+			{% if user.is_authenticated %}
+                        <li>
+                            <a href="{% url 'studio:post_list' %}">Studio</a>
+                        </li>
+			{% for link in links %}
+			    <li>
+				<a href="{{ link.href }}">{{ link.text }}</a>
+			    </li>
+			{% endfor %}
+			{% endif %}
+                    </ul>
+                </nav>
+            </div>
+            <div class="site-header__actions">
+		{% if user.is_authenticated %}
+                    <a class="site-header__email">{{ user.email }}</a>
+		    <form method="post" action="{% url 'accounts:logout' %}">
+			{% csrf_token %}
+			<button class="btn btn--primary" type="submit">
+			    {% heroicon_solid 'arrow-right-end-on-rectangle' class="btn__icon" aria_hidden="true" %}
+			    Logout
+			</button>
+		    </form>
+		{% else %}
+		    <a class="btn btn--outline" href="{% url 'accounts:teacher_profile_create' %}">
+			{% heroicon_solid 'user-plus' class="btn__icon" aria_hidden="true" %}
+			Sign Up
+                    </a>
+		    <a class="btn btn--primary" href="{% url 'accounts:login_form' %}">
+			{% heroicon_solid 'arrow-right-start-on-rectangle' class="btn__icon" aria_hidden="true" %}
+			Log in
+		    </a>
+		{% endif %}
+            </div>
+        </div>
+    </div>
+</header>

@@ -1,0 +1,20 @@
+<turbo-frame id="like-post-{{ post.pk }}">
+    <form
+	method="post"
+	{% if was_liked_by %}
+	    action="{% url 'content:post_unlike' post.pk %}"
+	{% else %}
+	    action="{% url 'content:post_like' post.pk %}"
+	{% endif %}
+    >
+	{% csrf_token %}
+	<button class="btn btn--outline-primary btn--sm">
+	    {% if was_liked_by %}
+		{% heroicon_solid 'hand-thumb-up' class="btn__icon" %}
+	    {% else %}
+		{% heroicon_outline 'hand-thumb-up' class="btn__icon" %}
+	    {% endif %}
+	    {{ likes }}
+	</button>
+    </form>
+</turbo-frame>

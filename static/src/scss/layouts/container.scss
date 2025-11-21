@@ -1,0 +1,16 @@
+@use "sprucecss/scss/spruce" as *;
+
+.container {
+  --inline-size: #{config('container-inline-size', $layout, false)};
+  --gap: #{spacer-clamp('m', 'l')};
+  padding-bottom: spacer('m');
+
+  @include layout-center(
+    var(--gap),
+    var(--inline-size)
+  );
+
+  &--narrow {
+    --inline-size: 50rem;
+  }
+}

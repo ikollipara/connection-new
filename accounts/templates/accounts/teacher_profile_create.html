@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <main class="container">
+	<h1>Create a Teacher Account</h1>
+	<p>
+	    Create a profile on conneCTION to post your own resources!
+	    These questions may seem like a lot, but it helps us know who is posting on the site.
+	</p>
+	<hr/>
+	<form method="post">
+	    {% csrf_token %}
+	    {{ form }}
+	    <button class="btn btn--primary">Create Account</button>
+	</form>
+    </main>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %} | Search{% endblock %}
+
+{% block bodyattrs %}class="search-body"{% endblock %}
+
+{% block content %}
+    <main class="search-container">
+	<img alt="" src="{% static 'logo-text.png' %}"/>
+	<p>
+	    conneCTION is an online community of Computer Science teachers across the K-12 levels. conneCTION features a rich repository of posts ranging from lessons to resources to theories. Use the form below to discover resources useful to you, or sign up and add your own!
+	</p>
+	<form method="get" data-controller="submit-form">
+	    {{ form }}
+	</form>
+    </main>
+{% endblock %}

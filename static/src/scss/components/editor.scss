@@ -1,0 +1,30 @@
+@use "sprucecss/scss/spruce" as *;
+
+
+.editor {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+
+    & > hr {
+	height: 5px;
+	width: 100%;
+    }
+
+    & > .form-group {
+	width: 100%;
+	padding-bottom: 1em;
+    }
+
+    & > [data-controller="editor"] {
+	width: 100%;
+    }
+
+    .form-control {
+	border-width: 0;
+	border-bottom-width: 1px;
+	border-radius: 0%;
+	font-size: font-size('h2');
+    }
+}

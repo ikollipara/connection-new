@@ -7,7 +7,7 @@ env = { "DEBUG" = true }
 run = "uv run manage.py test"
 description = "Test Django"
 depends = ["build"]
-env = { "DEBUG" = false, DJANGO_TASKS_BACKEND = "django_tasks.backends.dummy.DummyBackend", EMAIL_URL="memory:", DATABASE_URL = "mysql://connection:connection@127.0.0.1:3306/connection_test" }
+env = { "DEBUG" = false, DJANGO_TASKS_BACKEND = "django_tasks.backends.dummy.DummyBackend", EMAIL_URL="memory:", DATABASE_URL = "mysql://connection:connection@127.0.0.1:3306/connection" }
 depends_post = ["clean"]
 
 [tasks.fe-dev]

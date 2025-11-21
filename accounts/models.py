@@ -6,16 +6,21 @@ Date:        2025-11-12
 Description: Account Models
 """
 
+import typing as t
+
 from django.contrib.auth import models as auth_models
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+
+if t.TYPE_CHECKING:
+    from content.models import Grade
 
 # Create your models here.
 
 
 class UserManager(auth_models.UserManager):
     def create_superuser(self, email, password, **extra_fields):
-        super().create_superuser(email, email, password, **extra_fields)
+        return super().create_superuser(email, email, password, **extra_fields)
 
 
 class User(auth_models.AbstractUser):
@@ -26,9 +31,94 @@ class User(auth_models.AbstractUser):
     USERNAME_FIELD = "email"
     first_name = None
     last_name = None
+    username = models.CharField(
+        _("Username [Unused, leftover from django's defaults]"),
+        max_length=512,
+        null=True,
+        blank=True,
+    )
     EMAIL_FIELD = "email"
     REQUIRED_FIELDS = ["name"]
 
     email = models.EmailField(_("Email"), unique=True)
     name = models.CharField(_("Name"), max_length=512)
     followers = models.ManyToManyField("self")
+
+
+class TeacherProfileQuerySet(models.QuerySet["TeacherProfile"]):
+    """Custom Queryset for TeacherProfile."""
+
+    def create_teacher_profile(
+        self,
+        name: str,
+        email: str,
+        school: str,
+        subject: str,
+        years_of_experience: int,
+        gender: t.Literal["male", "female", "non-binary", "other"],
+        grades: t.Sequence["Grade"] = None,
+        biography: str = "",
+    ):
+        """Create a user with a teacher profile."""
+        user = User.objects.create_user(
+            email,
+            email,
+            name=name,
+            password="",
+        )
+        inst = self.model(
+            user=user,
+            school=school,
+            subject=subject,
+            years_of_experience=years_of_experience,
+            gender=gender,
+        )
+        inst.full_clean()
+        inst.save()
+        inst.grades.set(grades)
+
+        return inst
+
+
+class TeacherProfile(models.Model):
+    """
+    # TeacherProfile.
+
+    A custom profile model used to store details about a teacher.
+    """
+
+    class Gender(models.TextChoices):
+        """Possible Gender values."""
+
+        MALE = ("male", _("Male"))
+        FEMALE = ("female", _("Female"))
+        NON_BINARY = ("non-binary", _("Non-Binary"))
+        OTHER = ("other", _("Other"))
+
+    objects: TeacherProfileQuerySet = TeacherProfileQuerySet.as_manager()
+
+    user = models.OneToOneField(User, on_delete=models.DO_NOTHING)
+    picture = models.ImageField(
+        _("Profile Picture"),
+        null=True,
+        blank=True,
+    )
+    biography = models.TextField(_("Biography"), default="", blank=True)
+    grades = models.ManyToManyField(
+        "content.Grade",
+        related_name="teachers",
+        verbose_name=_("Grades"),
+        blank=True,
+    )
+    school = models.CharField(_("School"), max_length=512)
+    subject = models.CharField(_("Subject"), max_length=512)
+    years_of_experience = models.PositiveIntegerField(
+        _("Years of Experience"),
+        default=0,
+    )
+    gender = models.CharField(
+        _("Gender"),
+        max_length=255,
+        choices=Gender.choices,
+        default=Gender.FEMALE,
+    )

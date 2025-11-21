@@ -40,9 +40,9 @@ class SearchQuerySet(models.QuerySet["Search"]):
         inst = self.model(query=query, views=views, likes=likes)
         inst.full_clean()
         inst.save()
-        inst.grades.add(*grades)
-        inst.standards.add(*standards)
-        inst.results.add(*results)
+        inst.grades.set(grades)
+        inst.standards.set(standards)
+        inst.results.set(results)
 
         return inst
 
@@ -56,9 +56,17 @@ class Search(models.Model):
     rich methods.
     """
 
+    objects: SearchQuerySet = SearchQuerySet.as_manager()
+
     query = models.TextField(_("Query"))
     views = models.PositiveIntegerField(_("Views"), default=0)
     likes = models.PositiveIntegerField(_("Likes"), default=0)
     grades = models.ManyToManyField("content.Grade", related_name="+")
     standards = models.ManyToManyField("content.Standard", related_name="+")
     results = models.ManyToManyField("content.Post", related_name="+")
+    searched_at = models.DateTimeField(
+        _("Searched At"),
+        auto_now_add=True,
+        null=True,
+        blank=True,
+    )

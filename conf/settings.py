@@ -34,15 +34,18 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "core",
     "accounts",
     "content",
     "search",
+    "studio",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "heroicons",
     "django_vite",
     "django_tasks",
     "django_browser_reload",
@@ -75,6 +78,9 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+            ],
+            "builtins": [
+                "heroicons.templatetags.heroicons",
             ],
         },
     },
@@ -146,3 +152,10 @@ TASKS = {"default": {"BACKEND": env.str("DJANGO_TASKS_BACKEND")}}
 
 # Email
 vars().update(env.dj_email_url("EMAIL_URL"))
+
+# Django Debug Toolbar
+INTERNAL_IPS = [
+    # ...
+    "127.0.0.1",
+    # ...
+]

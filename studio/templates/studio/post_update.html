@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %} | Update a Post{% endblock %}
+
+{% block content %}
+    <main class="container">
+	<form id="post-form" method="post">
+	    {% csrf_token %}
+	    {{ form }}
+	</form>
+    </main>
+{% endblock %}

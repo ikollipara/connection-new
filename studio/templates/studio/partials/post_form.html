@@ -1,0 +1,62 @@
+{% load heroicons %}
+<div class="editor">
+    <div class="form-group" style="max-width: 650px;">
+	{{ form.title }}
+    </div>
+    <hr/>
+    <div class="button-group">
+	<button type="button" class="btn btn--outline-primary btn--sm" data-action="dialog#toggleDialog" data-dialog-id-param="metadata">
+	    Edit Metadata
+	</button>
+	<button class="btn btn--primary btn--sm">
+	    {% heroicon_micro 'bookmark-square' class="btn__icon" %}
+	    Save
+	</button>
+	<button class="btn btn--primary btn--sm" type="button" data-action="dialog#toggleDialog" data-dialog-id-param="help_modal">
+	    {% heroicon_micro 'question-mark-circle' class="btn__icon" %}
+	    Help
+	</button>
+    </div>
+    <hr/>
+    <div data-controller="editor">
+	{{ form.body }}
+	<div data-editor-target="holder"></div>
+    </div>
+</div>
+<dialog id="help_modal">
+    <h3>Post Editor</h3>
+    <p>
+	The post editor is the tool used for writing within conneCTION.
+	It features a powerful block-based editor, as well as tools for updating metdata.
+	Some of the interesting blocks include:
+	<ul>
+	    <li>Embeds for YouTube, Scratch, and Vimeo</li>
+	    <li>Images</li>
+	    <li>Attachments such as PDFs and Word Documents</li>
+	</ul>
+    </p>
+    <hr/>
+    <form method="dialog">
+	<button class="btn btn--primary">Ok</button>
+    </form>
+</dialog>
+<dialog class="stack" id="metadata">
+    <fieldset class="form-group-container">
+	<div class="form-group--row">
+	    <label class="form-label" for="{{ form.grades.id_for_label }}">{{ form.grades.label }}</label>
+	    {{ form.grades }}
+	</div>
+	<div class="form-group--row">
+	    <label class="form-label" for="{{ form.standards.id_for_label }}">{{ form.standards.label }}</label>
+	    {{ form.standards }}
+	</div>
+    </fieldset>
+    <div class="button-group">
+	<button form="post-form" class="btn btn--outline-primary">Save</button>
+	<form method="dialog">
+	    <button class="btn btn--primary">
+		Close
+	    </button>
+	</form>
+    </div>
+</dialog>
