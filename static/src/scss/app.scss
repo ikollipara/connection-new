@@ -10,6 +10,8 @@
 @forward "components/post-heading";
 @forward "components/post-content";
 @forward "components/post-author";
+@forward "components/timeline";
+@forward "components/sidebar";
 @forward "pages/search";
 @use "sprucecss/scss/spruce" as *;
 
@@ -58,3 +60,4 @@ dialog.stack {
 	margin-left: 1em;
     }
 }
+

@@ -21,7 +21,11 @@
 		    <div class="post-heading__meta">
 			<button class="btn btn--outline-primary btn--sm">{% heroicon_solid 'eye' class="btn__icon" %}{{ post.views }}</button>
 			{% if user.is_authenticated %}
-			    {% include 'content/partials/like_form.html' with likes=post.likes__count %}
+			    {% url 'content:post_like' post.pk as like_url %}
+			    {% url 'content:post_unlike' post.pk as unlike_url %}
+			    {% with likes=post.likes__count obj=post like_url=like_url unlike_url=unlike_url %}
+				{% include 'content/partials/like_form.html' %}
+			    {% endwith %}
 			{% else %}
 			    <a class="btn btn--outline-primary btn--sm" href="{% url 'accounts:login_form' %}">
 				{% heroicon_outline 'hand-thumb-up' class="btn__icon" %}
@@ -36,6 +40,9 @@
 			    <span class="sr-only">Posted on</span>
 			    <time datetime="{{ post.published_at }}">{{ post.published_at }}</time>
 			</span>
+			<button class="btn btn--outline-primary btn--sm" data-action="dialog#toggleDialog" data-dialog-id-param="comments-sidebar">
+			    Comments
+			</button>
 		    </div>
 		</div>
 	    </div>
@@ -47,8 +54,10 @@
 	    data-post-display-data-value="post_data"
 	>
 	</div>
-	<hr/>
-	<h3>Comments</h3>
-	
+	<dialog closedby="any" id="comments-sidebar" class="sidebar sidebar--right">
+	    <h3>Comments</h3>
+	    <turbo-frame id="comments-{{ post.pk }}" src="{% url 'content:comment_list' post.pk %}" loading="lazy">
+	    </turbo-frame>
+	</dialog>
     </main>
 {% endblock %}

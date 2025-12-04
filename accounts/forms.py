@@ -18,16 +18,23 @@ from django.urls import reverse_lazy
 from accounts.models import TeacherProfile, User
 
 
-def _validate_email_is_unique(value: str):
+def _validate_email_is_unique(user: User = None):
     """
     Validate the given value is unique among emails.
 
     Raise a validation error otherwise.
     """
-    if User.objects.filter(email=value).exists():
-        raise exceptions.ValidationError(
-            "An account with this email already exists.",
-        )
+
+    def inner(value: str):
+        does_exist = User.objects.filter(email=value).exists()
+        if user is not None and does_exist and user.email != value:
+            raise exceptions.ValidationError(
+                "An account with this email already exists.",
+            )
+        elif does_exist and user is None:
+            raise exceptions.ValidationError(
+                "An account with this email already exists.",
+            )
 
 
 def _validate_email_is_associated_with_an_user(value: str):
@@ -110,6 +117,10 @@ class TeacherProfileForm(InvalidStateMixin, forms.ModelForm):
         }
 
     def save(self, commit=True):
+        if self.instance.pk:
+            self.instance.update_with_user(**self.cleaned_data)
+            return self.instance
+
         return TeacherProfile.objects.create_teacher_profile(
             **self.cleaned_data,
         )

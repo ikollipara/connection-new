@@ -9,10 +9,11 @@
 import { Controller } from "@hotwired/stimulus";
 
 export default class extends Controller {
-  toggleDialog({ params: { id } }) {
+  toggleDialog({ params: { id, method = "showModal" } }) {
     const el = document.querySelector(`#${id}`);
     if (!el.open) {
-      el.showModal();
+      if (method === "showModal") el.showModal();
+      else el.show();
     } else {
       el.close();
     }

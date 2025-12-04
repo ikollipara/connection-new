@@ -4,6 +4,18 @@
 
 {% block content %}
     <main class="container">
+	{% if messages %}
+	    {% for message in messages %}
+		<div role="alert" class="alert alert--success" data-controller="remove-me">
+		    <div class="alert__caption">
+			{{ message }}			
+		    </div>
+		    <button class="alert__close" aria-label="Close alert" data-action="remove-me#remove">
+			{% heroicon_solid 'x-mark' %}
+		    </button>
+		</div>
+	    {% endfor %}
+	{% endif %}
 	<h1>conneCTION Studio</h1>
 	<hr/>
 	<turbo-frame id="posts" class="stack" data-controller="frame-reload" data-action="turbo:submit-end->frame-reload#reload:!self">

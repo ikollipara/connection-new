@@ -10,6 +10,7 @@ from django.contrib import messages
 from django.contrib.auth import login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.signing import SignatureExpired, TimestampSigner
 from django.http import HttpRequest, HttpResponse
@@ -33,12 +34,19 @@ class TeacherProfileCreateView(SuccessMessageMixin, generic.CreateView):
     form_class = TeacherProfileForm
     template_name = "accounts/teacher_profile_create.html"
     success_url = reverse_lazy("studio:post_list")
-    success_message = "Welcome %(name)!"
+    success_message = "Welcome %(name)s!"
 
     def form_invalid(self, form: TeacherProfileForm):
         """Handle invalid form."""
         response = super().form_invalid(form)
         response.status_code = 422
+        return response
+
+    def form_valid(self, form: TeacherProfileForm):
+        """Handle valid form."""
+        response = super().form_valid(form)
+        login(self.request, self.object.user)
+        response.status_code = 303
         return response
 
 
@@ -123,3 +131,52 @@ def logout(request: HttpRequest):
         "You have successfully logged out.",
     )
     return response
+
+
+class TeacherProfileUpdateView(
+    SuccessMessageMixin,
+    LoginRequiredMixin,
+    generic.UpdateView,
+):
+    """
+    # TeacherProfileUpdateView.
+
+    A view for updating your profile.
+    """
+
+    model = TeacherProfile
+    template_name = "accounts/teacher_profile_update.html"
+    form_class = TeacherProfileForm
+    success_url = reverse_lazy("accounts:teacher_profile_update")
+    success_message = "Profile successfully updated!"
+    extra_context = {
+        "links": [
+            {
+                "href": reverse_lazy("studio:post_create"),
+                "text": "Create a Post",
+            },
+            {
+                "href": reverse_lazy("accounts:teacher_profile_update"),
+                "text": "Your Profile",
+            },
+        ]
+    }
+
+    def get_object(self, queryset=None):
+        return self.request.user.teacherprofile
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields["name"].initial = self.request.user.name
+        form.fields["email"].initial = self.request.user.email
+        return form
+
+    def form_invalid(self, form):
+        response = super().form_invalid(form)
+        response.status_code = 422
+        return response
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        response.status_code = 303
+        return response

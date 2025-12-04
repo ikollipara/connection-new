@@ -1,0 +1,9 @@
+<div
+    data-controller="quill"
+    data-quill-name-value="{{ widget.name }}"
+    data-action="turbo:submit-start@document->quill#handleFormUpdate"
+    {% if widget.value %}data-quill-value-value="{{ widget.value|stringformat:'s' }}"{% endif %}
+    {% if widget.read_only %}data-quill-read-only-value="{{ widget.read_only }}"{% endif %}
+>
+</div>
+

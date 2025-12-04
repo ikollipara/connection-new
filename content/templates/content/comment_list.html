@@ -1,0 +1,44 @@
+<turbo-frame id="comments-{{ post.pk }}">
+    <div class="sidebar__content l-timeline">
+	{% for comment in comments %}
+	    <div class="l-timeline__item">
+		<div class="l-timeline__content">
+		    <strong>{{ comment.created_at }} - {{ comment.user.name }}</strong>
+		    {% autoescape off %}
+			{{ comment.body }}
+		    {% endautoescape %}
+		    <div class="button-group">
+			{% if user.is_authenticated %}
+			    {% url 'content:comment_like' comment.pk as like_url %}
+			    {% url 'content:comment_unlike' comment.pk as unlike_url %}
+			    {% include 'content/partials/like_form.html' with likes=comment.likes__count obj=comment was_liked_by=comment.was_liked_by_user %}
+			{% endif %}
+		    </div>
+		</div>
+	    </div>
+	{% empty %}
+	    <div class="l-timeline__content">
+		<p>No Comments Yet.</p>
+	    </div>
+	{% endfor %}
+    </div>
+    <div class="sidebar__bottom">
+	{% if user.is_authenticated %}
+	    <form autofocus class="comment-form" action="{% url 'content:comment_list' post.pk %}" method="post">
+		<div>
+		    {% csrf_token %}
+		    {{ form }}
+		    <button class="btn btn--primary btn--sm">
+			Comment
+		    </button>
+		</div>
+	    </form>
+	{% else %}
+	    <div>
+		<p>To create a comment, please create an account</p>
+		<a class="btn btn--primary btn--sm" href="{% url 'accounts:login_form' %}">Create an Account</a>
+	    </div>
+	{% endif %}
+    </div>
+
+</turbo-frame>

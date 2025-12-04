@@ -8,9 +8,13 @@
     align-items: center;
     block-size: var(--block-size);
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: spacer-clamp('s', 'l');
     justify-content: space-between;
+  }
+
+  @include breakpoint('md') {
+      flex-wrap: wrap;
   }
 
   &__column {

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <main class="container">
+	<h1>Update Your Teacher Account</h1>
+	{% if messages %}
+	    {% for message in messages %}
+		<div role="alert" class="alert alert--success" data-controller="remove-me">
+		    <div class="alert__caption">
+			{{ message }}			
+		    </div>
+		    <button class="alert__close" aria-label="Close alert" data-action="remove-me#remove">
+			{% heroicon_solid 'x-mark' %}
+		    </button>
+		</div>
+	    {% endfor %}
+	{% endif %}
+	<hr/>
+	<form method="post">
+	    {% csrf_token %}
+	    {{ form }}
+	    <button class="btn btn--primary">Update Account</button>
+	</form>
+    </main>
+{% endblock %}

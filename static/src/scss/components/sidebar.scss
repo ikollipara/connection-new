@@ -1,0 +1,74 @@
+@use "sprucecss/scss/spruce" as *;
+
+
+dialog:modal.sidebar {
+    max-height: 100%;
+
+}
+
+.sidebar {
+    height: 100dvh;
+    margin: 0;
+    margin-block: auto;
+    padding-block: 0;
+    border-radius: 0.325rem;
+    border: none;
+    width: 90dvw;
+    position: relative;
+    transition-property: width;
+    transition-duration: 0.3s;
+    transition-behavior: allow-discrete;
+
+
+    @include breakpoint('md') {
+	width: 60dvw;
+    }
+
+    @include breakpoint('lg') {
+	width: 40dvw;
+    }
+
+    &--right {
+	margin-left: auto
+    }
+
+    &--left {
+	margin-right: auto;
+    }
+
+    &__bottom {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+    }
+
+    &__content {
+	overflow-y: scroll;
+	height: 70%;
+    }
+
+    @starting-style {
+	width: 0%;
+    }
+
+}
+
+.comment-form {
+    padding-inline: spacer('s');
+    padding-top: spacer('s');
+    margin: spacer('s');
+
+    > * {
+	margin-bottom: spacer('s');
+    }
+
+    [data-controller=quill] {
+	min-height: 10dvh;
+	border:$color-black solid 1px;
+	border-radius: 0.325em;
+	margin-bottom: spacer('s');
+	overflow-y: scroll;
+	background: $color-white;
+    }
+}

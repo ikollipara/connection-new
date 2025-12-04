@@ -97,21 +97,34 @@ class TeacherProfile(models.Model):
 
     objects: TeacherProfileQuerySet = TeacherProfileQuerySet.as_manager()
 
-    user = models.OneToOneField(User, on_delete=models.DO_NOTHING)
+    user = models.OneToOneField(
+        User,
+        on_delete=models.DO_NOTHING,
+    )
     picture = models.ImageField(
         _("Profile Picture"),
         null=True,
         blank=True,
     )
-    biography = models.TextField(_("Biography"), default="", blank=True)
+    biography = models.TextField(
+        _("Biography"),
+        default="",
+        blank=True,
+    )
     grades = models.ManyToManyField(
         "content.Grade",
         related_name="teachers",
         verbose_name=_("Grades"),
         blank=True,
     )
-    school = models.CharField(_("School"), max_length=512)
-    subject = models.CharField(_("Subject"), max_length=512)
+    school = models.CharField(
+        _("School"),
+        max_length=512,
+    )
+    subject = models.CharField(
+        _("Subject"),
+        max_length=512,
+    )
     years_of_experience = models.PositiveIntegerField(
         _("Years of Experience"),
         default=0,
@@ -122,3 +135,29 @@ class TeacherProfile(models.Model):
         choices=Gender.choices,
         default=Gender.FEMALE,
     )
+
+    def update_with_user(
+        self,
+        name: str,
+        email: str,
+        school: str,
+        subject: str,
+        years_of_experience: int,
+        gender: t.Literal["male", "female", "non-binary", "other"],
+        grades: t.Sequence["Grade"] = None,
+        biography: str = "",
+    ):
+        """Update the profile with the user."""
+        if self.user.email != email:
+            self.user.email = email
+
+        self.user.name = name
+        self.user.save(update_fields=["name", "email"])
+
+        self.school = school
+        self.subject = subject
+        self.years_of_experience = years_of_experience
+        self.gender = gender
+        self.grades.set(grades)
+        self.biography = biography
+        self.save()

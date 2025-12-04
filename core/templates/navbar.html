@@ -13,6 +13,9 @@
                         <li>
                             <a href="{% url 'studio:post_list' %}">Studio</a>
                         </li>
+			<li>
+			    <a href="{% url 'search:search' %}">Search</a>
+			</li>
 			{% for link in links %}
 			    <li>
 				<a href="{{ link.href }}">{{ link.text }}</a>

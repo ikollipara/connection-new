@@ -268,8 +268,42 @@ class PostLike(models.Model):
 class CommentQuerySet(models.QuerySet["Comment"]):
     """Custom QuerySet for Comment."""
 
+    def for_post(self, post: Post):
+        """Filter the comments by the given post."""
+        return self.filter(post=post)
+
+    def for_parent(self, parent: Comment):
+        """Filter the given comments by the given parent."""
+        return self.filter(parent=parent)
+
+    def with_likes_count(self):
+        """Annotate the given comments with their like count."""
+        return self.annotate(likes__count=models.Count("likes"))
+
+    def with_liked_by_user(self, user: UserModel):
+        """Annotate to include `was_liked_by_user`."""
+        return self.annotate(
+            was_liked_by_user=models.Subquery(
+                models.Exists(
+                    CommentLike.objects.filter(
+                        user=user,
+                        comment=models.OuterRef("pk"),
+                    )
+                )
+            )
+        )
+
+    def with_user(self):
+        """Preload the user relationship."""
+        return self.prefetch_related("user")
+
     def create_reply(
-        self, user: UserModel, comment: "Comment", body: str, *, post: Post = None
+        self,
+        user: UserModel,
+        comment: "Comment",
+        body: str,
+        *,
+        post: Post = None,
     ):
         """Create a reply to the given comment. Optionally specify the post."""
         inst = self.model(
@@ -311,6 +345,27 @@ class Comment(models.Model):
         blank=True,
     )
     body = models.TextField(_("Body"))
+    created_at = models.DateTimeField(_("Created At"), auto_now_add=True)
+
+    class Meta:
+        """Comment Meta Config."""
+
+        ordering = [
+            "-created_at",
+            models.Count("likes").desc(),
+        ]
+
+    def like(self, user: UserModel):
+        """Like the given post."""
+        self.likes.create(user=user)
+
+    def unlike(self, user: UserModel):
+        """Unlike the given post."""
+        self.likes.filter(user=user).delete()
+
+    def was_liked_by(self, user: UserModel):
+        """Check if the given post was liked by the given user."""
+        return self.likes.filter(user=user).exists()
 
 
 class CommentLike(models.Model):

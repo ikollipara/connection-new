@@ -16,6 +16,7 @@ import SubmitFormController from "./controllers/submit_form_controller";
 import DialogController from "./controllers/dialog_controller";
 import FrameReloadController from "./controllers/frame_reload_controller";
 import PostDisplayController from "./controllers/post_display_controller";
+import RemoveMeController from "./controllers/remove_me_controller";
 
 window.Turbo = Turbo;
 
@@ -30,3 +31,4 @@ Stimulus.register("submit-form", SubmitFormController);
 Stimulus.register("dialog", DialogController);
 Stimulus.register("frame-reload", FrameReloadController);
 Stimulus.register("post-display", PostDisplayController);
+Stimulus.register("remove-me", RemoveMeController);

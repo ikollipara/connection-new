@@ -16,24 +16,23 @@ export default class extends Controller {
   }
 
   async #setupQuill() {
-    await import("quill/dist/quill.core.css");
+    const styles = Promise.all([import("quill/dist/quill.core.css"), import("quill/dist/quill.bubble.css")]);
     const { default: Quill } = await import("quill");
     this.div = document.createElement("div");
+    const _ = await styles;
     this.element.appendChild(this.div);
 
     this.quill = new Quill(this.div, {
       theme: "bubble",
       readOnly: this.readOnlyValue,
-      modules: {
-        toolbar: [["bold", "italic", "underline", "strike"]],
-        clipboard: true,
-      },
     });
 
     this.quill.clipboard.dangerouslyPasteHTML(this.valueValue, "silent");
   }
 
   handleFormUpdate(event) {
-    event.formData.append(this.nameValue, this.quill.getSemanticHTML());
+    const formSubmission = event.detail.formSubmission;
+    console.log(formSubmission);
+    formSubmission.body.append(this.nameValue, this.quill.getSemanticHTML());
   }
 }

@@ -30,7 +30,16 @@ class PostListView(LoginRequiredMixin, FormMixin, generic.ListView):
     template_name = "studio/post_list.html"
     context_object_name = "posts"
     extra_context = {
-        "links": [{"href": reverse_lazy("studio:post_create"), "text": "Create a Post"}]
+        "links": [
+            {
+                "href": reverse_lazy("studio:post_create"),
+                "text": "Create a Post",
+            },
+            {
+                "href": reverse_lazy("accounts:teacher_profile_update"),
+                "text": "Your Profile",
+            },
+        ]
     }
     form_class = PostFilterForm
 
@@ -101,7 +110,11 @@ class PostCreateView(LoginRequiredMixin, generic.CreateView):
             {
                 "href": reverse_lazy("studio:post_create"),
                 "text": "Create a Post",
-            }
+            },
+            {
+                "href": reverse_lazy("accounts:teacher_profile_update"),
+                "text": "Your Profile",
+            },
         ]
     }
     initial = {"body": {"blocks": []}}

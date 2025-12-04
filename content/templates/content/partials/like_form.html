@@ -1,10 +1,10 @@
-<turbo-frame id="like-post-{{ post.pk }}">
+<turbo-frame id="like-{{ obj.pk }}">
     <form
 	method="post"
 	{% if was_liked_by %}
-	    action="{% url 'content:post_unlike' post.pk %}"
+	    action="{{ unlike_url }}"
 	{% else %}
-	    action="{% url 'content:post_like' post.pk %}"
+	    action="{{ like_url }}"
 	{% endif %}
     >
 	{% csrf_token %}

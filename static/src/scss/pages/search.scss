@@ -7,9 +7,13 @@
 .search-container {
     display: flex;
     flex-direction: column;
-    margin-inline: auto;
+    margin-inline: spacer('m');
     max-width: 120ch;
     padding-bottom: 5em;
+
+    @include breakpoint('lg') {
+	margin-inline: auto;
+    }
 
     p {
 	text-align: center;

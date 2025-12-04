@@ -34,4 +34,9 @@ urlpatterns = [
         views.validate_and_login,
         name="validate_and_login",
     ),
+    path(
+        "teachers/update/",
+        views.TeacherProfileUpdateView.as_view(),
+        name="teacher_profile_update",
+    ),
 ]

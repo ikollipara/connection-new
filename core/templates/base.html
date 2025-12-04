@@ -7,21 +7,6 @@
 	{% vite_asset 'static/src/app.js' %}
 	{% block head %}{% endblock %}
         <title>conneCTION{% block title %}{% endblock %}</title>
-	{% if debug %}
-	    <script>
-	     if (typeof window.Turbo !== "undefined") {
-		 document.AddEventListener("turbo:load", function(detail) {
-		     if (
-			 typeof window.djdt !== "undefined"
-			 && detail.target instanceof HTMLBodyElement
-		     ) {
-			 djdt.show_toolbar();
-		     }
-		 });
-	     }	     
-	    </script>
-	{% endif %}
-
     </head>
     <body {% block bodyattrs %}data-controller="dialog"{% endblock %}>
 	{% include 'navbar.html' %}

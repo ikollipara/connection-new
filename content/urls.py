@@ -34,4 +34,19 @@ urlpatterns = [
         views.unlike_post,
         name="post_unlike",
     ),
+    path(
+        "posts/<int:post_pk>/comments/",
+        views.CommentListView.as_view(),
+        name="comment_list",
+    ),
+    path(
+        "comments/<int:pk>/likes/create/",
+        views.like_comment,
+        name="comment_like",
+    ),
+    path(
+        "comments/<int:pk>/likes/delete/",
+        views.unlike_comment,
+        name="comment_unlike",
+    ),
 ]

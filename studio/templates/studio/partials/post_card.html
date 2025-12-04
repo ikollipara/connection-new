@@ -1,7 +1,10 @@
 {% load heroicons %}
 <turbo-frame id="post_{{ post.pk }}" class="post-card post-card--horizontal">
     <div class="post-card__body">
-        <div class="post-card__meta">
+        <h2 class="post-card__title">
+            <a data-turbo-frame="_top" class="post-card__link" href="{% url 'studio:post_update' post.pk %}">{{ post.title }}</a>
+        </h2>
+	<div class="post-card__meta">
 	    <div class="post-card__tags">
 		{% if post.metadata.grades.count %}
 		    <span>Grades: {{ post.metadata.grades.all|join:", " }}</span>
@@ -15,9 +18,6 @@
 		<time datetime="{{ post.published_at }}">{{ post.published_at }}</time>
 	    {% endif %}
         </div>
-        <h2 class="post-card__title">
-            <a data-turbo-frame="_top" class="post-card__link" href="{% url 'studio:post_update' post.pk %}">{{ post.title }}</a>
-        </h2>
 	<div class="button-group">
 	    {% if not post.published_at %}
 		<form method="post" action="{% url 'studio:post_publish' post.pk %}">

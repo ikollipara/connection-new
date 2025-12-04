@@ -2,6 +2,7 @@
 
 .post-content {
   @include layout-stack;
+  padding-bottom: spacer('m');  
 
   @include breakpoint('md') {
     font-size: 1.0375rem;
