@@ -40,7 +40,7 @@ hide = true
 
 [tasks.clean]
 description = "Clean built static assets"
-run = "rm -rf staticfiles"
+run = ["rm -rf staticfiles", "rm -rf ./static/dist/*"]
 
 [tasks.build]
 description = "Build Static Assets"
@@ -48,6 +48,15 @@ run = [
   { task = "fe-build" },
   { task = "django-build" },
 ]
+
+[tasks.preview]
+description = "Run Site in Build Preview"
+depends = "build"
+depends_post = "clean"
+run = [
+  "uv run gunicorn --workers=1 conf.wsgi:application",
+]
+env = { DEBUG = false, ALLOWED_HOSTS="localhost,127.0.0.1" }
 
 [tools]
 node = "latest"

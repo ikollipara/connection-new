@@ -8,9 +8,21 @@
 
 import { defineConfig } from "vite";
 import * as path from "node:path";
+import compression, { defineAlgorithm } from "vite-plugin-compression2";
 
 export default defineConfig({
-  plugins: [],
+  plugins: [
+    compression({
+      algorithms: [
+        "gzip",
+        defineAlgorithm("brotliCompress", {
+          params: {
+            [require("zlib").constants.BROTLI_PARAM_QUALITY]: 11,
+          },
+        }),
+      ],
+    }),
+  ],
   base: "/static/",
   resolve: {
     alias: {
