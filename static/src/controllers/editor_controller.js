@@ -8,30 +8,54 @@
 
 import { Controller } from "@hotwired/stimulus";
 
+/**
+ * Editor Controller
+ * ---------------------------------
+ * This controller handles the initialization of the
+ * [Editor.js](https://editorjs.io) text editor.
+ * This is used for writing the content on the site.
+ */
 export default class extends Controller {
-  static targets = ["input", "holder"];
-  static values = { readOnly: { type: Boolean, default: false } };
+  static targets = [
+    // The element that will hold the text value of the editor.
+    // This is used to enable form integration.
+    "input",
+    // What element to initialize the editor into.
+    "holder",
+  ];
+  static values = {
+    // Whether the contents should be considered read only.
+    // This is used for displaying the posts.
+    readOnly: { type: Boolean, default: false },
+  };
 
   connect() {
     this.#setupEditor();
   }
 
   #setupEditor() {
-    Promise.all([import("@editorjs/editorjs"), this.#configureTools()]).then(([{ default: EditorJS }, tools]) => {
-      this.editor = new EditorJS({
-        tools,
-        holder: this.holderTarget,
-        data: JSON.parse(this.inputTarget.value),
-        placeholder: this.inputTarget.placeholder,
-        onChange: async (api, event) => {
-          const data = await api.saver.save();
-          this.inputTarget.value = JSON.stringify(data);
-          this.dispatch("change", { detail: { data } });
-        },
-      });
-    });
+    // We dynamically import the editor to save on the initial bundle size.
+    Promise.all([import("@editorjs/editorjs"), this.#configureTools()]).then(
+      ([{ default: EditorJS }, tools]) => {
+        this.editor = new EditorJS({
+          tools,
+          holder: this.holderTarget,
+          data: JSON.parse(this.inputTarget.value),
+          placeholder: this.inputTarget.placeholder,
+          onChange: async (api, event) => {
+            const data = await api.saver.save();
+            this.inputTarget.value = JSON.stringify(data);
+            this.dispatch("change", { detail: { data } });
+          },
+        });
+      },
+    );
   }
 
+  /**
+   * Import and Configure the Editor.js tools used.
+   * @returns All used tools for the Editor.js instance.
+   */
   async #configureTools() {
     const [
       { default: header },
@@ -72,7 +96,8 @@ export default class extends Controller {
             pintrest: true,
             scratch: {
               regex: /https?:\/\/scratch.mit.edu\/projects\/(\d+)/,
-              embedUrl: "https://scratch.mit.edu/projects/<%= remote_id %>/embed",
+              embedUrl:
+                "https://scratch.mit.edu/projects/<%= remote_id %>/embed",
               html: "<iframe height='300' scrolling='no' frameborder='no' allowtransparency='true' allowfullscreen='true' style='width: 100%;'></iframe>",
             },
           },

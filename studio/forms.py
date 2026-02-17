@@ -9,6 +9,7 @@ Description: Forms for studio
 from content.models import Grade, Post, PostMetadata, Standard
 from django import forms
 from django.forms import widgets
+import typing as t
 
 
 class PostFilterForm(forms.Form):
@@ -114,8 +115,11 @@ class PostForm(forms.ModelForm):
             ),
         }
 
+    @t.override
     def save(self, commit=True):
         """Save the model form."""
+        # If the model exists, update it.
+        # The pk won't be set if the model doesn't exist.
         if self.instance.pk:
             return Post.objects.update_post_with_metadata(
                 self.instance.pk,

@@ -1,0 +1,18 @@
+<turbo-frame id="research__study_list">
+    {% for study in studies %}
+	<div class="info-card">
+	    <div class="info-card__caption">
+		<h2 class="info-card__title">{{ study.name }}</h2>
+	    </div>
+	    <button class="info-card__link" data-action="dialog#toggleDialog" data-dialog-id-param="study_detail_{{ study.pk }}">Learn more</button>
+	</div>
+	<dialog id="study_detail_{{ study.pk }}">
+	    <turbo-frame id="research__consent_to_study" src="{% url 'research:stdy_consent_form' %}" loading="lazy">
+	    </turbo-frame>
+	</dialog>
+    {% empty %}
+	<div>
+	    <h2 style="color: var(--spruce-css-gray); font-style: italic;">No Studies.</h2>
+	</div>
+    {% endfor %}
+</turbo-frame>

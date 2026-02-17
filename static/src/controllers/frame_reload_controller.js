@@ -8,6 +8,11 @@
 
 import { Controller } from "@hotwired/stimulus";
 
+/**
+ * Frame Reload Controller
+ * ------------------------------
+ * A controller to enable dynamic reloading of a Turbo Frame.
+ */
 export default class extends Controller {
   reload() {
     this.element.reload();

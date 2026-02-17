@@ -13,12 +13,25 @@ from django.urls import reverse_lazy
 from django.views import generic
 from django.views.decorators.http import require_POST
 from django.views.generic.edit import FormMixin, ProcessFormView
-
+from http import HTTPStatus
 from content import tasks
 from content.forms import CommentForm
 from content.models import Comment, CommentLike, Post
-
+import typing as t
 # Create your views here.
+
+
+def _minutes(minutes: int) -> int:
+    """
+    Convert the given minute value to seconds.
+    This is used in the `max_age` property.
+
+    :param minutes: The total number of minutes to convert.
+    :type minutes: int
+    :return: A time in seconds
+    :rtype: int
+    """
+    return minutes * 60
 
 
 class PostDetailView(generic.DetailView):
@@ -28,9 +41,11 @@ class PostDetailView(generic.DetailView):
     template_name = "content/post_detail.html"
     context_object_name = "post"
 
+    @t.override
     def get_queryset(self):
         return super().get_queryset().prefetch_related("metadata").with_likes_count()
 
+    @t.override
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx["was_liked_by"] = self.get_object().was_liked_by(self.request.user)
@@ -42,7 +57,7 @@ def view_post(request: HttpRequest, pk: int):
     """View the the given post."""
     if request.COOKIES.get(f"viewed_{pk}"):
         response = HttpResponse()
-        response.status_code = 204
+        response.status_code = HTTPStatus.NO_CONTENT
 
         return response
 
@@ -52,10 +67,10 @@ def view_post(request: HttpRequest, pk: int):
         response.set_cookie(
             f"viewed_{pk}",
             True,
-            max_age=60 * 5,
+            max_age=_minutes(5),
             httponly=True,
         )
-        response.status_code = 201
+        response.status_code = HTTPStatus.CREATED
 
         return response
 
@@ -123,21 +138,25 @@ class CommentListView(FormMixin, generic.ListView, ProcessFormView):
     context_object_name = "comments"
     form_class = CommentForm
 
+    @t.override
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
         self.comment_post = Post.objects.get(pk=self.kwargs["post_pk"])
 
+    @t.override
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs["request"] = self.request
         kwargs["post"] = self.comment_post
         return kwargs
 
+    @t.override
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx["post"] = self.comment_post
         return ctx
 
+    @t.override
     def get_queryset(self):
         return (
             Comment.objects.for_post(self.kwargs["post_pk"])
@@ -146,17 +165,20 @@ class CommentListView(FormMixin, generic.ListView, ProcessFormView):
             .with_likes_count()
         )
 
+    @t.override
     def form_valid(self, form):
         self.object = form.save()
         response = super().form_valid(form)
         response.status_code = 303
         return response
 
+    @t.override
     def form_invalid(self, form):
         response = super().form_invalid(form)
         response.status_code = 422
         return response
 
+    @t.override
     def get_success_url(self):
         return reverse_lazy("content:comment_list", kwargs=self.kwargs)
 

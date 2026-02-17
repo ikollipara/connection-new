@@ -1,0 +1,13 @@
+@use "sprucecss/scss/spruce" as *;
+
+
+.consent-dialog[open] {
+    display: flex;
+    border: 1px $color-primary solid;
+    border-radius: spacer('s');
+
+
+    &::backdrop {
+	opacity: 0.8;
+    }
+}

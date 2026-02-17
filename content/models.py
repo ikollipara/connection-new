@@ -17,6 +17,9 @@ from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 
+if t.TYPE_CHECKING:
+    from django.contrib.auth.models import AbstractUser
+
 UserModel = get_user_model()
 
 # Create your models here.
@@ -94,7 +97,7 @@ class PostQuerySet(models.QuerySet["Post"]):
 
     def create_post_for_user(
         self,
-        user: UserModel,
+        user: AbstractUser,
         *,
         title: str = "",
         body: dict = None,
@@ -131,7 +134,7 @@ class PostQuerySet(models.QuerySet["Post"]):
 
         return inst
 
-    def for_user(self, user: UserModel):
+    def for_user(self, user: AbstractUser):
         """Filter the query by the given user."""
         return self.filter(user=user)
 
@@ -176,9 +179,18 @@ class Post(models.Model):
 
     objects: PostQuerySet = PostQuerySet.as_manager()
 
-    title = models.CharField(_("Title"), max_length=512)
-    body = models.JSONField(_("Body"), blank=True)
-    user = models.ForeignKey(UserModel, on_delete=models.DO_NOTHING)
+    title = models.CharField(
+        _("Title"),
+        max_length=512,
+    )
+    body = models.JSONField(
+        _("Body"),
+        blank=True,
+    )
+    user = models.ForeignKey(
+        UserModel,
+        on_delete=models.DO_NOTHING,
+    )
     published_at = models.DateTimeField(
         _("Published At"),
         null=True,
@@ -223,15 +235,15 @@ class Post(models.Model):
         self.published_at = dt or timezone.now()
         self.save()
 
-    def like(self, user: UserModel):
+    def like(self, user: AbstractUser):
         """Like the given post."""
         self.likes.create(user=user)
 
-    def unlike(self, user: UserModel):
+    def unlike(self, user: AbstractUser):
         """Unlike the given post."""
         self.likes.filter(user=user).delete()
 
-    def was_liked_by(self, user: UserModel):
+    def was_liked_by(self, user: AbstractUser):
         """Check if the given post was liked by the given user."""
         return self.likes.filter(user=user).exists()
 
@@ -280,7 +292,7 @@ class CommentQuerySet(models.QuerySet["Comment"]):
         """Annotate the given comments with their like count."""
         return self.annotate(likes__count=models.Count("likes"))
 
-    def with_liked_by_user(self, user: UserModel):
+    def with_liked_by_user(self, user: AbstractUser):
         """Annotate to include `was_liked_by_user`."""
         return self.annotate(
             was_liked_by_user=models.Subquery(
@@ -299,7 +311,7 @@ class CommentQuerySet(models.QuerySet["Comment"]):
 
     def create_reply(
         self,
-        user: UserModel,
+        user: AbstractUser,
         comment: "Comment",
         body: str,
         *,
@@ -355,15 +367,15 @@ class Comment(models.Model):
             models.Count("likes").desc(),
         ]
 
-    def like(self, user: UserModel):
+    def like(self, user: AbstractUser):
         """Like the given post."""
         self.likes.create(user=user)
 
-    def unlike(self, user: UserModel):
+    def unlike(self, user: AbstractUser):
         """Unlike the given post."""
         self.likes.filter(user=user).delete()
 
-    def was_liked_by(self, user: UserModel):
+    def was_liked_by(self, user: AbstractUser):
         """Check if the given post was liked by the given user."""
         return self.likes.filter(user=user).exists()
 
@@ -430,6 +442,10 @@ class Grade(models.Model):
     """
 
     name = models.CharField(_("Name"), max_length=255, unique=True)
+    sort_order = models.IntegerField(_("Sort Order"), unique=True)
+
+    class Meta:
+        ordering = ["sort_order"]
 
     def __str__(self):
         return self.name.capitalize()

@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+from sys import argv
 
 from environs import Env
 
@@ -27,6 +28,7 @@ SECRET_KEY = env.str("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool("DEBUG", default=False)
+TESTING = not DEBUG and "test" in argv
 
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=[], subcast=str)
 
@@ -39,6 +41,7 @@ INSTALLED_APPS = [
     "content",
     "search",
     "studio",
+    "research",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -50,7 +53,6 @@ INSTALLED_APPS = [
     "django_vite",
     "django_tasks",
     "django_browser_reload",
-    "debug_toolbar",
     "django_watchfiles",
 ]
 
@@ -58,7 +60,6 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django_http_compression.middleware.HttpCompressionMiddleware",
-    "debug_toolbar.middleware.DebugToolbarMiddleware",
     "django_browser_reload.middleware.BrowserReloadMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -162,3 +163,18 @@ INTERNAL_IPS = [
     "127.0.0.1",
     # ...
 ]
+
+LOG_LEVEL = env.str("LOG_LEVEL", "DEBUG" if TESTING or DEBUG else "INFO")
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": LOG_LEVEL,
+    },
+}

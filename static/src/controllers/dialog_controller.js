@@ -8,6 +8,13 @@
 
 import { Controller } from "@hotwired/stimulus";
 
+/**
+ * Dialog Controller
+ * ------------------------
+ * This controller allows dynamic access to modals.
+ * This can be removed once everything is converted to
+ * using the new (as of 2026) `commandfor` attribute.
+ */
 export default class extends Controller {
   toggleDialog({ params: { id, method = "showModal" } }) {
     const el = document.querySelector(`#${id}`);

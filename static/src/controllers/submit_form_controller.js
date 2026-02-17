@@ -8,6 +8,11 @@
 
 import { Controller } from "@hotwired/stimulus";
 
+/**
+ * Submit Form Controller
+ * -------------------------
+ * A controller to dynamically submit a form using the HTML5 Form API.
+ */
 export default class extends Controller {
   submit() {
     this.element.requestSubmit();

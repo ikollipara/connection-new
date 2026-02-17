@@ -23,6 +23,7 @@ from django.views.decorators.http import require_GET, require_POST
 
 from accounts.forms import LoginForm, TeacherProfileForm
 from accounts.models import TeacherProfile, User
+import typing as t
 
 # Create your views here.
 
@@ -36,12 +37,20 @@ class TeacherProfileCreateView(SuccessMessageMixin, generic.CreateView):
     success_url = reverse_lazy("studio:post_list")
     success_message = "Welcome %(name)s!"
 
+    @t.override
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs["request"] = self.request
+        return kwargs
+
+    @t.override
     def form_invalid(self, form: TeacherProfileForm):
         """Handle invalid form."""
         response = super().form_invalid(form)
         response.status_code = 422
         return response
 
+    @t.override
     def form_valid(self, form: TeacherProfileForm):
         """Handle valid form."""
         response = super().form_valid(form)
@@ -60,6 +69,7 @@ class LoginFormView(generic.FormView):
     form_class = LoginForm
     template_name = "accounts/login_form.html"
 
+    @t.override
     def dispatch(self, request, *args, **kwargs):
         """Handle the additional case of redirecting a logged in user."""
         if self.request.user.is_authenticated:
@@ -73,6 +83,7 @@ class LoginFormView(generic.FormView):
         else:
             return super().dispatch(request, *args, **kwargs)
 
+    @t.override
     def form_valid(self, form: LoginForm):
         """Send the form email."""
         form.send_login_email(self.request)
@@ -84,6 +95,7 @@ class LoginFormView(generic.FormView):
         )
         return response
 
+    @t.override
     def form_invalid(self, form: LoginForm):
         """Handle invalid."""
         response = super().form_invalid(form)
@@ -96,6 +108,7 @@ class LoginFormView(generic.FormView):
 def validate_and_login(request: HttpRequest):
     """Validate the given token and login the user."""
     signer = TimestampSigner()
+
     if not request.GET.get("token", default=None):
         response = HttpResponse("No Token Provided.")
         response.status_code = 400
@@ -162,20 +175,24 @@ class TeacherProfileUpdateView(
         ]
     }
 
+    @t.override
     def get_object(self, queryset=None):
         return self.request.user.teacherprofile
 
+    @t.override
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
         form.fields["name"].initial = self.request.user.name
         form.fields["email"].initial = self.request.user.email
         return form
 
+    @t.override
     def form_invalid(self, form):
         response = super().form_invalid(form)
         response.status_code = 422
         return response
 
+    @t.override
     def form_valid(self, form):
         response = super().form_valid(form)
         response.status_code = 303

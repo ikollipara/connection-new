@@ -1,0 +1,27 @@
+<mjml>
+    <mj-body>
+	<mj-section>
+	    <mj-column>
+		<mj-text>
+		    <h1>New Survey from {{ study_name }}</h1>
+		</mj-text>
+		<mj-text>
+		    <h2>{{ survey_name }}</h2>
+		</mj-text>
+		<mj-text>
+		    <p>
+			{% autoescape off %}
+			    {{ survey_message }}
+			{% endautoescape %}
+		    </p>
+		</mj-text>
+		<mj-button href="{{ survey_link }}">
+		    Complete Survey
+		</mj-button>
+		<mj-text>
+		    <p>If the above button does not work, use the following link: {{ survey.link }}</p>
+		</mj-text>
+	    </mj-column>
+	</mj-section>
+    </mj-body>
+</mjml>

@@ -16,9 +16,9 @@ from django.http import HttpRequest
 from django.urls import reverse_lazy
 
 from accounts.models import TeacherProfile, User
+import typing as t
 
-
-def _validate_email_is_unique(user: User = None):
+def _validate_email_is_unique(user: User):
     """
     Validate the given value is unique among emails.
 
@@ -26,15 +26,18 @@ def _validate_email_is_unique(user: User = None):
     """
 
     def inner(value: str):
+        print(f"{user=} {value=}")
         does_exist = User.objects.filter(email=value).exists()
-        if user is not None and does_exist and user.email != value:
+        if user.is_authenticated and does_exist and user.email != value:
             raise exceptions.ValidationError(
                 "An account with this email already exists.",
             )
-        elif does_exist and user is None:
+        elif does_exist and user.is_anonymous:
             raise exceptions.ValidationError(
                 "An account with this email already exists.",
             )
+
+    return inner
 
 
 def _validate_email_is_associated_with_an_user(value: str):
@@ -43,7 +46,6 @@ def _validate_email_is_associated_with_an_user(value: str):
 
     Raise a validation error otherwise.
     """
-
     if not User.objects.filter(email=value).exists():
         raise exceptions.ValidationError(
             "An account with that email does not exist. Try signing up!"
@@ -64,8 +66,12 @@ class TeacherProfileForm(InvalidStateMixin, forms.ModelForm):
         widget=widgets.EmailInput({"class": "form-control"}),
         label="Email",
         help_text="Your account's email. This will be used for logging in.",
-        validators=[_validate_email_is_unique],
     )
+
+    def __init__(self, request, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["email"].validators.append(_validate_email_is_unique(request.user))
+        print(self.fields["email"].validators)
 
     class Meta:
         """Meta options."""
@@ -116,6 +122,7 @@ class TeacherProfileForm(InvalidStateMixin, forms.ModelForm):
             "gender": "Please input your gender. If yours is not one of the provided, please select other and contact the maintainer so we can update and include your gender.",
         }
 
+    @t.override
     def save(self, commit=True):
         if self.instance.pk:
             self.instance.update_with_user(**self.cleaned_data)

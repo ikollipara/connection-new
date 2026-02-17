@@ -6,9 +6,9 @@
  * Description: Main Frontend Entrypoint
  */
 
-import "./scss/app.scss";
-import * as Turbo from "@hotwired/turbo";
 import { Application } from "@hotwired/stimulus";
+import * as Turbo from "@hotwired/turbo";
+import "./scss/app.scss";
 
 window.Turbo = Turbo;
 

@@ -7,7 +7,7 @@ requires-python = ">=3.12"
 dependencies = [
     "django>=5.2.8",
     "django-http-compression[brotli]>=1.2.0",
-    "django-tasks>=0.9.0",
+    "django-tasks>=0.10.0",
     "django-vite>=3.1.0",
     "environs[django]>=14.5.0",
     "gunicorn>=23.0.0",
@@ -26,4 +26,5 @@ dev = [
     "django-watchfiles>=1.4.0",
     "factory-boy>=3.3.3",
     "playwright>=1.56.0",
+    "time-machine[dateutil]>=3.1.0",
 ]

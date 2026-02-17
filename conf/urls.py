@@ -25,10 +25,8 @@ urlpatterns = [
     path("accounts/", include("accounts.urls")),
     path("studio/", include("studio.urls")),
     path("content/", include("content.urls")),
+    path("research/", include("research.urls")),
 ]
 
 if settings.DEBUG:
-    from debug_toolbar.toolbar import debug_toolbar_urls
-
     urlpatterns += [path("__reload__/", include("django_browser_reload.urls"))]
-    urlpatterns += debug_toolbar_urls()

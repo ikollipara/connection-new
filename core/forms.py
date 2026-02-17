@@ -15,6 +15,10 @@ class InvalidStateMixin:
     that have an error in the response.
     """
 
+    # The project uses [Sprucecss](https://sprucecss.com/), which includes some styles
+    # for handling invalid and valid form states. This mixin enables those automatically
+    # based on the form errors.
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 

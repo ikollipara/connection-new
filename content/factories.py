@@ -95,6 +95,7 @@ class CommentFactory(DjangoModelFactory[Comment]):
     class Params:
         """Params."""
 
+        # Create a comment that is a reply. Replies have the `is_reply` set to a comment.
         is_reply = Trait(parent=SubFactory("content.factories.CommentFactory"))
 
     post = SubFactory(PostFactory)

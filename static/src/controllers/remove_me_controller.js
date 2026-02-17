@@ -8,6 +8,12 @@
 
 import { Controller } from "@hotwired/stimulus";
 
+/**
+ * Remove Me Controller
+ * ------------------------
+ * A controller that will dynamically remove
+ * the current element from the DOM.
+ */
 export default class extends Controller {
   remove() {
     this.element.remove();

@@ -12,12 +12,14 @@
 @forward "components/post-author";
 @forward "components/timeline";
 @forward "components/sidebar";
+@forward "components/info-card";
 @forward "pages/search";
+@forward "pages/post-list";
 @use "sprucecss/scss/spruce" as *;
 
 @include generate-styles();
 
-select {
+:root {
     --ss-primary-color: $primary-color;
     --ss-border-color: var(--spruce-form-color-border);
     --ss-border-radius: 0.425rem;

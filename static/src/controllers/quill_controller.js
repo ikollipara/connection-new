@@ -8,17 +8,35 @@
 
 import { Controller } from "@hotwired/stimulus";
 
+/**
+ * Quill Controller
+ * --------------------------
+ * A controller handling the initialization of the quill.js text editor.
+ * Quill is used to handle comments and other, less intense writing.
+ */
 export default class extends Controller {
-  static values = { name: String, value: { type: String, default: "" }, readOnly: { type: Boolean, default: false } };
+  static values = {
+    // The name of the quill.js editor instance.
+    // This is used to integrate with HTML forms.
+    name: String,
+    value: { type: String, default: "" },
+    // Whether the contents should be considered read only.
+    readOnly: { type: Boolean, default: false },
+  };
 
   connect() {
     this.#setupQuill();
   }
 
   async #setupQuill() {
-    const styles = Promise.all([import("quill/dist/quill.core.css"), import("quill/dist/quill.bubble.css")]);
+    // We dynamically import the modules to save on the initial bundle size.
+    const styles = Promise.all([
+      import("quill/dist/quill.core.css"),
+      import("quill/dist/quill.bubble.css"),
+    ]);
     const { default: Quill } = await import("quill");
     this.div = document.createElement("div");
+    // This ensures that the styles are loaded before continuing.
     const _ = await styles;
     this.element.appendChild(this.div);
 

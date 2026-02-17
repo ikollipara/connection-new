@@ -1,0 +1,16 @@
+<turbo-frame id="research__open_to_studies">
+    <form class="stack" method="post" action="{% url 'research:open_to_studies' %}">
+	{% csrf_token %}
+	<section class="post-content">
+	    <h2>Open to Research Studies</h2>
+	    <p>
+		conneCTION is not just a community, but also a tool used in research to further the field of CS Ed.
+		If you are interested in advancing CS Ed, please check the box below.
+		<br/>
+		This is entirely optional, but we really appreciate the support as we both work to grow this field!
+	    </p>
+	</section>
+	{{ form }}
+	<button class="btn btn--outline-primary" type="submit">Submit</button>
+    </form>
+</turbo-frame>

@@ -34,5 +34,17 @@
 		{% endfor %}
 	    </div>
 	</turbo-frame>
+	{% if not has_consent_profile %}
+	    <dialog
+		data-turbo-temporary
+		id="consent_dialog"
+		class="consent-dialog"
+		data-action="turbo:frame-load->dialog#toggleDialog:once"
+		data-dialog-id-param="consent_dialog"
+	    >
+		<turbo-frame id="research__open_to_studies" src="{% url 'research:open_to_studies' %}">
+		</turbo-frame>		
+	    </dialog>
+	{% endif %}
     </main>
 {% endblock %}

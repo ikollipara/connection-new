@@ -9,6 +9,13 @@
 import { Controller } from "@hotwired/stimulus";
 import edjsHTML from "editorjs-html";
 
+/**
+ * Post Display Controller
+ * ------------------------------
+ * A controller to convert the editor.js JSON data
+ * into HTML data that we can style more easily.
+ * Relies on the editorjs-html package.
+ */
 export default class extends Controller {
   static values = { data: String };
 
@@ -17,7 +24,9 @@ export default class extends Controller {
   }
 
   connect() {
-    const data = JSON.parse(document.getElementById(this.dataValue).textContent);
+    const data = JSON.parse(
+      document.getElementById(this.dataValue).textContent,
+    );
     this.element.innerHTML = this.parser.parse(data);
   }
 }

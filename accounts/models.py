@@ -19,30 +19,53 @@ if t.TYPE_CHECKING:
 
 
 class UserManager(auth_models.UserManager):
+    """Custom model manager for User."""
+
+    @t.override
     def create_superuser(self, email, password, **extra_fields):
+        """Create a superuser.
+
+        Wrap the existing behavior to allow for just email.
+        """
         return super().create_superuser(email, email, password, **extra_fields)
 
 
 class User(auth_models.AbstractUser):
-    """User Account."""
+    """User Account.
+
+    Every user of connection is represented by this model.
+    As such, its quite generic. The application uses a
+    "profile" system to seperate out outher users.
+    See `accounts.models.TeacherProfile` for an example.
+    """
 
     objects: UserManager = UserManager()
 
     USERNAME_FIELD = "email"
+    EMAIL_FIELD = "email"
+    REQUIRED_FIELDS = ["name"]
+    # Removed Fields
     first_name = None
     last_name = None
+
     username = models.CharField(
         _("Username [Unused, leftover from django's defaults]"),
         max_length=512,
         null=True,
         blank=True,
     )
-    EMAIL_FIELD = "email"
-    REQUIRED_FIELDS = ["name"]
-
     email = models.EmailField(_("Email"), unique=True)
     name = models.CharField(_("Name"), max_length=512)
     followers = models.ManyToManyField("self")
+
+    def has(self, related_field: str):
+        """Check if the user has the related_field."""
+        try:
+            getattr(self, related_field)
+            return True
+
+        except models.Model.DoesNotExist:
+            return False
 
 
 class TeacherProfileQuerySet(models.QuerySet["TeacherProfile"]):

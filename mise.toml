@@ -6,9 +6,7 @@ env = { "DEBUG" = true }
 [tasks.test]
 run = "uv run manage.py test"
 description = "Test Django"
-depends = ["build"]
 env = { "DEBUG" = false, DJANGO_TASKS_BACKEND = "django_tasks.backends.dummy.DummyBackend", EMAIL_URL="memory:", DATABASE_URL = "mysql://connection:connection@127.0.0.1:3306/connection" }
-depends_post = ["clean"]
 
 [tasks.fe-dev]
 run = "npm run dev"
@@ -18,6 +16,7 @@ hide = true
 [tasks.django-dev]
 run = "uv run manage.py runserver"
 description = "Django Dev"
+
 hide = true
 
 [tasks.dev]
@@ -58,6 +57,10 @@ run = [
 ]
 env = { DEBUG = false, ALLOWED_HOSTS="localhost,127.0.0.1" }
 
+[tasks.docker]
+description = "Run Docker Commands"
+run = "docker"
+
 [tools]
 node = "latest"
 python = "3.12"
@@ -69,3 +72,4 @@ DATABASE_URL = "mysql://connection:connection@127.0.0.1:3306/connection"
 MARIADB_ROOT_PASSWORD = "connection"
 DJANGO_TASKS_BACKEND = "django_tasks.backends.immediate.ImmediateBackend"
 EMAIL_URL="smtp://localhost:1025"
+LOG_LEVEL="INFO"

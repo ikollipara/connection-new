@@ -16,6 +16,36 @@ from django_tasks import task
 
 
 @task
+def send_mass_email(
+    subject: str,
+    from_: str,
+    to: t.Sequence[str],
+    template: str,
+    context: dict,
+    headers: dict[str, str] = None,
+):
+    """Send a mass email."""
+    connection = mail.get_connection()
+    content = mrml.to_html(render_to_string(template, context)).content
+    plain_text = html.strip_tags(content)
+
+    msgs = [
+        mail.EmailMultiAlternatives(
+            subject,
+            plain_text,
+            from_,
+            [email],
+            connection=connection,
+        )
+        for email in to
+    ]
+
+    for msg in msgs:
+        msg.attach_alternative(content, "text/html")
+    connection.send_messages(msgs)
+
+
+@task
 def send_email(
     subject: str,
     from_: str,

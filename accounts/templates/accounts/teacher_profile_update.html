@@ -21,5 +21,10 @@
 	    {{ form }}
 	    <button class="btn btn--primary">Update Account</button>
 	</form>
+	<hr/>
+	{% if user.consentprofile.is_open %}
+	    <h2>Available Studies</h2>
+	    <turbo-frame id="research__study_list" src="{% url 'research:study_list' %}"></turbo-frame>
+	{% endif %}
     </main>
 {% endblock %}
